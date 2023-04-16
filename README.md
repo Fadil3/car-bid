@@ -1,4 +1,6 @@
 # car-bid
+Merupakan sebuah desain database sederhana untuk pelelangan mobil.
+
 
 ## ERD
 
@@ -80,4 +82,70 @@ CREATE TABLE iklan_has_bid (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 );
+```
+
+## Contoh pembuatan dummy data
+Berikut ini merupakan contoh pembuatan dummy data kota dan user. Contoh lain dapat dilihat langsung pada file [main.py](https://github.com/Fadil3/car-bid/blob/master/main.py).
+```python
+import psycopg2
+from faker import Faker
+import csv
+
+
+def save_to_csv(nama_file, data):
+    with open(nama_file + '.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(data[0].keys())
+        for row in data:
+            writer.writerow(row.values())
+
+
+conn = psycopg2.connect(
+    dbname="car_bid",
+    user="postgres",
+    password="admin",
+    host="localhost",
+    port="5432"
+)
+
+cur = conn.cursor()
+
+fake_id = Faker('id_ID')
+
+# data kota
+data_kota = []
+# read data from csv
+with open('city.csv', 'r') as file:
+    reader = csv.reader(file)
+    for row in reader:
+        data_kota.append(
+            {
+                'kota_id': row[0],
+                'nama_kota': row[1],
+                'latitude': row[2],
+                'longitude': row[3]
+
+            }
+        )
+#  delete first row
+data_kota.pop(0)
+sql_kota = 'INSERT INTO kota (kota_id, nama_kota, latitude, longitude) VALUES (%(kota_id)s, %(nama_kota)s, %(latitude)s, %(longitude)s) '
+cur.executemany(sql_kota, data_kota)
+
+# data user
+data_user = []
+for i in range(20):
+    data_user.append(
+        {
+            'nama': fake_id.name(),
+            'kota_id': data_kota[fake_id.random_int(min=0, max=14)]['kota_id'],
+            'kontak': fake_id.phone_number()
+        }
+    )
+
+save_to_csv('data_user', data_user)
+sql_user = 'INSERT INTO "user" (nama, kota_id, kontak) VALUES (%(nama)s, %(kota_id)s, %(kontak)s) '
+cur.executemany(sql_user, data_user)
+#  check if data is successfully inserted
+cur.execute('SELECT * FROM "user"')
 ```
