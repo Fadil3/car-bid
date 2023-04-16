@@ -4,7 +4,7 @@ Merupakan sebuah desain database sederhana untuk pelelangan mobil.
 
 ## ERD
 
-![image](https://user-images.githubusercontent.com/55126764/232321165-27e0b937-bd38-46cd-b260-f5dcf146cbe1.png)
+![image](https://user-images.githubusercontent.com/55126764/232323710-5793c2f8-2b21-4a35-a9b3-28c4b1ac5192.png)
 
 ## DDL
 
